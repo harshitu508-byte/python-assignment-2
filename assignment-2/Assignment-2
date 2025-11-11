@@ -1,1 +1,89 @@
+'''
+Project: GradeBook Analyzer
+Student Name: Harshit upadhayay
+Date: 09-11-2025
+'''
 
+import csv
+
+print("GradeBook Analyzer")
+
+while True:
+    print("\nChoose an option:")
+    print("1. Enter data manually")
+    print("2. Load data from CSV file")
+    print("3. Exit")
+    
+    choice = input("Enter your choice (1/2/3): ")
+    marks = {}
+    
+    if choice == "1":
+        n = int(input("How many students? "))
+        for i in range(n):
+            name = input(f"Enter name of student {i+1}: ")
+            score = float(input(f"Enter marks for {name}: "))
+            marks[name] = score
+    elif choice == "2":
+        filename = input("Enter CSV file name (with .csv): ")
+        try:
+            with open(filename, "r") as f:
+                reader = csv.reader(f)
+                next(reader) 
+                for row in reader:
+                    if len(row) >= 2:
+                        name = row[0]
+                        score = float(row[1])
+                        marks[name] = score
+            print(f"\nLoaded {len(marks)} records from '{filename}'")
+        except:
+            print("File not found or invalid format.")
+            continue
+    elif choice == "3":
+        print("\nExiting")
+        break
+    else:
+        print("Invalid choice, try again!")
+        continue
+
+    if not marks:
+        continue
+    avg = sum(marks.values()) / len(marks)
+    high = max(marks.values())
+    low = min(marks.values())
+
+    grades = {}
+    for name, score in marks.items():
+        if score >= 90:
+            grade = "A"
+        elif score >= 80:
+            grade = "B"
+        elif score >= 70:
+            grade = "C"
+        elif score >= 60:
+            grade = "D"
+        else:
+            grade = "F"
+        grades[name] = grade
+
+    passed = [name for name, s in marks.items() if s >= 40]
+    failed = [name for name, s in marks.items() if s < 40]
+
+    print("\nName\t\tMarks\tGrade")
+    for name in marks:
+        print(f"{name}\t\t{marks[name]}\t{grades[name]}")
+
+    print("\n--- Summary ---")
+    print(f"Average Marks : {avg:.2f}")
+    print(f"Highest Marks : {high}")
+    print(f"Lowest Marks  : {low}")
+    print(f"Passed Students ({len(passed)}): {passed}")
+    print(f"Failed Students ({len(failed)}): {failed}")
+
+    save = input("\nDo you want to export the results to CSV? (y/n): ")
+    if save.lower() == "y":
+        with open("results.csv", "w", newline="") as f:
+            writer = csv.writer(f)
+            writer.writerow(["Name", "Marks", "Grade"])
+            for name in marks:
+                writer.writerow([name, marks[name], grades[name]])
+        print("Results saved successfully to 'results.csv'")
